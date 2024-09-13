@@ -5,7 +5,7 @@
 |   Info      |        Description     |
 | ----------- | ---------------------- |
 | TeamID      |        Team-117        |
-| TeamName    |         abcs         |
+| TeamName    |         abcd         |
 | Captain     |       Kazmain Shah    |
 | Captain     |  kshah228@illinois.edu  |
 | Member1     |     Sona Krishnan      |
