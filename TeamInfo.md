@@ -12,7 +12,7 @@
 | Member1     |  sonavk2@illinois.edu   |
 | Member2     |    Nathan Parekh      |
 | Member2     |   nparekh4@illinois.edu|
-| Member3     |     Sana Affak          |
+| Member3     |     Sana Affakh          |
 | Member3     |       naffakh3@illinois.edu      |
 
 ## Project Information
