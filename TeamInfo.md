@@ -36,16 +36,21 @@ Many of us experience a plateau in our fitness journey, often due to repetitive 
 
 
 #### Realness (datasets):
-[https://app.gigasheet.com/spreadsheet/gym-exercise-dataset/bcb08ead_e277_4e74_89d1_70504656ab9f?_gl=1*1mc5nqj*_gcl_au*MTE1NDQ4MjczMS4xNzI2NTIzNDc2](https://app.gigasheet.com/spreadsheet/gym-exercise-dataset/bcb08ead_e277_4e74_89d1_70504656ab9f_gl=1*1mc5nqj*_gcl_au*MTE1NDQ4MjczMS4xNzI2NTIzNDc2)
+[https://app.gigasheet.com/spreadsheet/gym-exercise-dataset/bcb08ead_e277_4e74_89d1_70504656ab9f?_gl=1*1mc5nqj*_gcl_au*MTE1NDQ4MjczMS4xNzI2NTIzNDc2](https://app.gigasheet.com/spreadsheet/gym-exercise-dataset/bcb08ead_e277_4e74_89d1_70504656ab9f_gl=1*1mc5nqj*_gcl_au*MTE1NDQ4MjczMS4xNzI2NTIzNDc2):
+
 "The megaGymDataset.csv table contains information on 2918 gym exercises, including titles, descriptions, types, body parts targeted, equipment needed, difficulty levels, ratings, and rating descriptions. This dataset can be used to analyze popular exercises, create personalized workout plans, and assess the effectiveness of different types of workouts"
 
+--
 
-[https://www.kaggle.com/datasets/aadhavvignesh/calories-burned-during-exercise-and-activities/data](https://www.kaggle.com/datasets/aadhavvignesh/calories-burned-during-exercise-and-activities/data)
+[https://www.kaggle.com/datasets/aadhavvignesh/calories-burned-during-exercise-and-activities/data](https://www.kaggle.com/datasets/aadhavvignesh/calories-burned-during-exercise-and-activities/data):
+
 "Calories Burned During Exercise and Activities
 Dataset containing the amount of calories burned during several activities."
 
+--
 
-[https://data.world/coreyhermanson/toughest-sport-by-skilldata.world](https://data.world/coreyhermanson/toughest-sport-by-skilldata.world)
+[https://data.world/coreyhermanson/toughest-sport-by-skilldata.world](https://data.world/coreyhermanson/toughest-sport-by-skilldata.world):
+
 60 sports ranked across 10 skill categories by ESPN panel to determine what skillsets are prioritized by each sport. (strength, flexibility, endurance, coordination, etc.)
 
 #### Functionality: 
