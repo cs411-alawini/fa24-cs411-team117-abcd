@@ -61,6 +61,9 @@ Dataset containing the amount of calories burned during several activities."
 - **Creative Component:** Clickable muscular skeleton that you can click to choose which muscles to work and it will query all the muscles for that muscle group	
 
 
+#### Mockup:
+![image](Mockup.png)
+
 
 
 #### Workflow:
