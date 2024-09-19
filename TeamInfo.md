@@ -45,7 +45,7 @@ Many of us experience a plateau in our fitness journey, often due to repetitive 
 Dataset containing the amount of calories burned during several activities."
 
 
-Toughest Sport by Skill - dataset by coreyhermanson: [https://data.world/coreyhermanson/toughest-sport-by-skilldata.world](https://data.world/coreyhermanson/toughest-sport-by-skilldata.world)
+[https://data.world/coreyhermanson/toughest-sport-by-skilldata.world](https://data.world/coreyhermanson/toughest-sport-by-skilldata.world)
 60 sports ranked across 10 skill categories by ESPN panel to determine what skillsets are prioritized by each sport. (strength, flexibility, endurance, coordination, etc.)
 
 #### Functionality: 
