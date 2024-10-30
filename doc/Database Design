@@ -1,0 +1,66 @@
+CREATE TABLE Users (
+    User_ID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Age INT,
+    Gender VARCHAR(10),
+    Height DECIMAL(4, 1),
+    Weight DECIMAL(5, 1),
+    Fitness_level VARCHAR(15),
+    Goal VARCHAR(255)
+);
+
+CREATE TABLE Exercises (
+    Exercise_ID INT PRIMARY KEY,
+    Exercise_Name VARCHAR(255),
+    Muscle_Group VARCHAR(100),
+    Difficulty INT
+);
+
+CREATE TABLE Plan (
+    Plan_id INT PRIMARY KEY,
+    Plan_name VARCHAR(255),
+    User_ID INT,
+    FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
+);
+
+CREATE TABLE Session (
+    Session_ID INT PRIMARY KEY,
+    Session_Name VARCHAR(100),
+    User_ID  INT,
+    FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
+);
+
+CREATE TABLE Sets (
+    Set_ID INT PRIMARY KEY,
+    Set_Name VARCHAR(100),
+    User_ID INT,
+    FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
+);
+
+CREATE TABLE Plan_Contains (
+    Plan_ID INT,
+    Session_ID INT,
+    Day_of_Week VARCHAR(10),
+    PRIMARY KEY (Plan_ID, Session_ID),
+    FOREIGN KEY (Plan_ID) REFERENCES Plan(Plan_ID),
+    FOREIGN KEY (Session_ID) REFERENCES Session(Session_ID)
+);
+
+CREATE TABLE Session_Contains (
+    Session_ID INT,
+    Set_ID INT,
+    Set_Reps INT,
+    PRIMARY KEY (Session_ID, Set_ID),
+    FOREIGN KEY (Session_ID) REFERENCES Session(Session_ID),
+    FOREIGN KEY (Set_ID) REFERENCES Sets(Set_ID)
+);
+
+CREATE TABLE Set_Contains (
+    Set_ID INT,
+    Exercise_ID INT,
+    E_Reps INT,
+    PRIMARY KEY (Set_ID, Exercise_ID),
+    FOREIGN KEY (Set_ID) REFERENCES Sets(Set_ID),
+    FOREIGN KEY (Exercise_ID) REFERENCES Exercises(Exercise_ID)
+);
+
