@@ -4,9 +4,9 @@
 
 
 #### Summary: 
-Our project SplitData is an app that personalizes your workout schedule based on your goals and abilities. It will create workout plans that fit your schedule, prioritize your preferred muscle groups, and build your desired athletic skill sets, all while making sure that you are not neglecting any areas in your training.
+Our project SplitData is an app allows users to build and share workout schedules. Users will create workout plans that fit their schedule, develop their desired athletic skill sets, and share their creations with other users. 
 
-The application will take in data about the health benefits of certain gym exercises and help map the user's overall fitness goals first into more targeted, metric-based goals and then create a plan that the user can follow to achieve those goals. The user will need to input their basic health information and goals, but will no longer need to make detailed decisions about their optimal training plan, because SplitData will do that part for them.
+The application will take in data about certain gym exercises and help the user create a plan that the user can follow to achieve those goals. The user will be able to use those exercises in the components of their workout plans; then, they and other users will be able to reuse the components they create.
 
 #### Usefulness:
 Many of us experience a plateau in our fitness journey, often due to repetitive routines and uncertainty about how to challenge ourselves effectively. Our app aims to elevate the workouts of recreational gym-goers by providing personalized training plans that adapt to each user's progress. By setting tailored goals and benchmarks, the app encourages users to continually push their limits and enhance their performance. With insights and recommendations that evolve alongside their fitness journey, users can break through barriers, discover new strengths, and achieve their desired results with confidence. 
@@ -31,11 +31,10 @@ Dataset containing the amount of calories burned during several activities."
 60 sports ranked across 10 skill categories by ESPN panel to determine what skillsets are prioritized by each sport. (strength, flexibility, endurance, coordination, etc.)
 
 #### Functionality: 
-- User preference quiz to determine their goals and current skill level
-- Creates plan with workouts that help them achieve their goals
-- setting tailored goals and benchmarks
-- Recommendations to help them understand exercise movement better, and continue to push themselves in the gym
-- **Creative Component:** Clickable muscular skeleton that you can click to choose which muscles to work and it will query all the muscles for that muscle group	
+- Basic user operations
+- Users may create plans and subcomponents to put in them (sessions, sets) with exercises, and share them with others
+- Other users can reuse sessions and sets in their own plans
+- **Creative Component:** we will create a heuristic model that allows us to suggest plans, sessions, and sets to users at various phases in their interaction with our website (for example, when browsing plans to try out, recommend plans, but when building plans, recccomend sessions and sets).
 
 
 #### Mockup:

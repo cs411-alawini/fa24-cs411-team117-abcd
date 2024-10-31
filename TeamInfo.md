@@ -29,6 +29,6 @@
 
 
 #### Summary: 
-Our project SplitData is an app that personalizes your workout schedule based on your goals and abilities. It will create workout plans that fit your schedule, prioritize your preferred muscle groups, and build your desired athletic skill sets, all while making sure that you are not neglecting any areas in your training.
+Our project SplitData is an app allows users to build and share workout schedules. Users will create workout plans that fit their schedule, develop their desired athletic skill sets, and share their creations with other users. 
 
-The application will take in data about the health benefits of certain gym exercises and help map the user's overall fitness goals first into more targeted, metric-based goals and then create a plan that the user can follow to achieve those goals. The user will need to input their basic health information and goals, but will no longer need to make detailed decisions about their optimal training plan, because SplitData will do that part for them.
+The application will take in data about certain gym exercises and help the user create a plan that the user can follow to achieve those goals. The user will be able to use those exercises in the components of their workout plans; then, they and other users will be able to reuse the components they create.
