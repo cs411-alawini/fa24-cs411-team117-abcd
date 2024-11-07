@@ -1,44 +1,67 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import styles from './FilteredWorkoutList.module.css';
 
 function FilteredWorkoutList({ onAddWorkout }) {
-  // Hardcoded list of exercises
-  const exercisesData = [
-    { id: 1, name: 'Push-up', muscleGroup: 'Chest', difficulty: 'Easy' },
-    { id: 2, name: 'Squat', muscleGroup: 'Legs', difficulty: 'Medium' },
-    { id: 3, name: 'Deadlift', muscleGroup: 'Back', difficulty: 'Hard' },
-    { id: 4, name: 'Bench Press', muscleGroup: 'Chest', difficulty: 'Medium' },
-    { id: 5, name: 'Lunges', muscleGroup: 'Legs', difficulty: 'Easy' },
-    { id: 6, name: 'Pull-up', muscleGroup: 'Back', difficulty: 'Hard' },
-    // Add more exercises as needed
-  ];
-
-  const [muscleGroup, setMuscleGroup] = useState('');
+  const [exercises, setExercises] = useState([]);
+  const [muscleGroup, setMuscleGroup] = useState('All');
   const [search, setSearch] = useState('');
   const [filteredExercises, setFilteredExercises] = useState([]);
+  const [exerciseSetsReps, setExerciseSetsReps] = useState({});
+
+  const muscleGroups = [
+    'All', 'Abdominals', 'Abductors', 'Adductors', 'Biceps', 'Calves',
+    'Chest', 'Forearms', 'Glutes', 'Hamstrings', 'Lats', 'Lower Back',
+    'Middle Back', 'Neck', 'Quadriceps', 'Shoulders', 'Traps', 'Triceps'
+  ];
 
   useEffect(() => {
-    const filtered = exercisesData.filter((exercise) => {
+    const fetchExercises = async () => {
+      try {
+        const response = await axios.get('http://localhost:5005/api/exercises', {
+          params: { muscleGroup: muscleGroup === 'All' ? '' : muscleGroup }
+        });
+        setExercises(response.data);
+        setFilteredExercises(response.data);
+      } catch (error) {
+        console.error('Error fetching exercises:', error);
+      }
+    };
+    fetchExercises();
+  }, [muscleGroup]);
+
+  useEffect(() => {
+    const filtered = exercises.filter((exercise) => {
       return (
-        (muscleGroup === '' || exercise.muscleGroup === muscleGroup) &&
-        exercise.name.toLowerCase().includes(search.toLowerCase())
+        exercise.Exercise_Name &&
+        exercise.Exercise_Name.toLowerCase().includes(search.toLowerCase())
       );
     });
     setFilteredExercises(filtered);
-  }, [muscleGroup, search]);
+  }, [search, exercises]);
 
-  const [reps, setReps] = useState('');
-  const [sets, setSets] = useState('');
+  const handleInputChange = (exerciseId, type, value) => {
+    setExerciseSetsReps((prev) => ({
+      ...prev,
+      [exerciseId]: {
+        ...prev[exerciseId],
+        [type]: value,
+      },
+    }));
+  };
 
   const handleAdd = (exercise) => {
+    const { reps, sets } = exerciseSetsReps[exercise.Exercise_ID] || {};
     if (reps && sets) {
       onAddWorkout({
-        name: exercise.name,
+        name: exercise.Exercise_Name,
         reps: parseInt(reps),
         sets: parseInt(sets),
       });
-      setReps('');
-      setSets('');
+      setExerciseSetsReps((prev) => ({
+        ...prev,
+        [exercise.Exercise_ID]: { reps: '', sets: '' },
+      }));
     } else {
       alert('Please specify reps and sets.');
     }
@@ -48,22 +71,19 @@ function FilteredWorkoutList({ onAddWorkout }) {
     <div className={styles.filteredWorkoutList}>
       <h3>Select Workout</h3>
 
-      {/* Scrollable Exercise List with Filter Buttons and Search */}
       <div className={styles.exerciseContainer}>
-        {/* Muscle Group Filter Buttons */}
         <div className={styles.filterButtons}>
-          {['All', 'Chest', 'Legs', 'Back'].map((group) => (
+          {muscleGroups.map((group) => (
             <button
               key={group}
               className={`${styles.filterButton} ${muscleGroup === group ? styles.active : ''}`}
-              onClick={() => setMuscleGroup(group === 'All' ? '' : group)}
+              onClick={() => setMuscleGroup(group)}
             >
               {group}
             </button>
           ))}
         </div>
 
-        {/* Search Input Inside Scrollable Box */}
         <input
           type="text"
           placeholder="Search exercises"
@@ -72,26 +92,38 @@ function FilteredWorkoutList({ onAddWorkout }) {
           className={styles.searchInput}
         />
 
+        {/* Column Headers */}
+        <div className={styles.headerRow}>
+          <span className={styles.header}>Exercise Name</span>
+          <span className={styles.header}>Muscle Group</span>
+          <span className={styles.header}>Difficulty</span>
+          <span className={styles.header}>Reps</span>
+          <span className={styles.header}>Sets</span>
+        </div>
+
         {/* Exercise List */}
         {filteredExercises.map((exercise) => (
-          <div key={exercise.id} className={styles.exerciseItem}>
-            <span>{exercise.name}</span>
-            <span>{exercise.muscleGroup}</span>
-            <span>({exercise.difficulty})</span>
+          <div key={exercise.Exercise_ID} className={styles.exerciseItem}>
+            <span className={styles.column}>{exercise.Exercise_Name}</span>
+            <span className={styles.column}>{exercise.Muscle_Group}</span>
+            <span className={styles.column}>({exercise.Difficulty})</span>
             <input
-              type="number"
-              placeholder="Reps"
-              value={reps}
-              onChange={(e) => setReps(e.target.value)}
-              min="1"
+            type="number"
+            placeholder="Reps"
+            value={exerciseSetsReps[exercise.Exercise_ID]?.reps || ''}
+            onChange={(e) => handleInputChange(exercise.Exercise_ID, 'reps', e.target.value)}
+            className={`${styles.column} ${styles.smallInput}`} /* Apply smallInput class */
+            min="1"
             />
             <input
-              type="number"
-              placeholder="Sets"
-              value={sets}
-              onChange={(e) => setSets(e.target.value)}
-              min="1"
+            type="number"
+            placeholder="Sets"
+            value={exerciseSetsReps[exercise.Exercise_ID]?.sets || ''}
+            onChange={(e) => handleInputChange(exercise.Exercise_ID, 'sets', e.target.value)}
+            className={`${styles.column} ${styles.smallInput}`} /* Apply smallInput class */
+            min="1"
             />
+
             <button onClick={() => handleAdd(exercise)} className={styles.addButton}>
               Add
             </button>
