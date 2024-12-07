@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './LoginPage.css'; // Using a regular CSS file
 
 function LoginPage({ onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleLogin = () => {
         onLogin(username, password);
+        navigate('/dashboard');
     };
-
+    
     return (
         <div className="login-root">
             <div className="hero-background">

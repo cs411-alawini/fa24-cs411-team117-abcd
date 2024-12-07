@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FilteredWorkoutList from './FilteredWorkoutList';
 import styles from './DaySelector.module.css';
 
-const days = ['M', 'T', 'W', 'Th', 'F', 'Sa', 'Su'];
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function DaySelector({ onAddWorkout }) {
   const [selectedDay, setSelectedDay] = useState(null);

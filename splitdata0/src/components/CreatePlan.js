@@ -1,38 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './CreatePlan.module.css';
 
-function CreatePlan({ onCreate }) {
-  const [showForm, setShowForm] = useState(false);
-  const [planName, setPlanName] = useState('');
-  const [userName, setUserName] = useState('');
-
-  const handleSubmit = () => {
-    onCreate({ planName, userName });
-  };
+function CreatePlan() {
+  const navigate = useNavigate();
 
   return (
     <div className={styles.createPlan}>
-      {!showForm ? (
-        <button onClick={() => setShowForm(true)} className={styles.createButton}>
-          Create Plan
-        </button>
-      ) : (
-        <div className={styles.form}>
-          <input
-            placeholder="Plan Name"
-            value={planName}
-            onChange={(e) => setPlanName(e.target.value)}
-          />
-          <input
-            placeholder="Your Name"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-          />
-          <button onClick={handleSubmit} className={styles.submitButton}>
-            Submit
-          </button>
-        </div>
-      )}
+      <button
+        onClick={() => navigate('/create-plan')}
+        className={styles.createButton}
+      >
+        Create Plan
+      </button>
     </div>
   );
 }
