@@ -1,8 +1,11 @@
-import React from 'react';
+// import React from 'react';
+import React, { useState, useEffect } from 'react'; // changed this
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';  // (changed this) Use the context to get the user_id
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
+    const { userId } = useUser();  // (changed this) Get user_id from context
     const navigate = useNavigate();
 
     return (
@@ -12,6 +15,7 @@ const Dashboard = () => {
                 {/* User Info Section */}
                 <div className={styles.userInfo}>
                     <h2>Welcome USER</h2>
+                    <p>Your user ID is: {userId || 'N/A'}
                     <p>Age: 25</p>
                     <p>Height: 6'0"</p>
                     <p>Width: 180 lbs</p>
