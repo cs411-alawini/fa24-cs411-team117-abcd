@@ -53,27 +53,64 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-app.post('/api/register', (req, res) => {
-  const { name, age, gender, height, weight, fitnessLevel, goal, username, password } = req.body;
+app.post("/api/register", (req, res) => {
+  const {
+      name,
+      age,
+      gender,
+      height,
+      weight,
+      fitnessLevel,
+      goal,
+      username,
+      password,
+  } = req.body;
 
-  // Insert the new user into the Users table
+  // Parse numerical fields with validation
+  const parsedAge = age ? parseInt(age, 10) : null;
+  const parsedHeight = height ? parseFloat(height).toFixed(1) : null;
+  const parsedWeight = weight ? parseFloat(weight).toFixed(1) : null;
+
+  // Validate fields
+  if (parsedAge && (parsedAge < 18 || parsedAge > 150)) {
+      return res.status(400).json({ error: "Age must be between 18 and 150." });
+  }
+  if (parsedHeight && (parsedHeight <= 0 || isNaN(parsedHeight))) {
+      return res.status(400).json({ error: "Height must be a positive number." });
+  }
+  if (parsedWeight && (parsedWeight <= 0 || isNaN(parsedWeight))) {
+      return res.status(400).json({ error: "Weight must be a positive number." });
+  }
+
+  // Prepare the query to insert the user into the database
   const query = `
       INSERT INTO Users (Name, Age, Gender, Height, Weight, Fitness_level, Goal, username, password) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
+  const values = [
+      name || null,
+      parsedAge,
+      gender || null,
+      parsedHeight,
+      parsedWeight,
+      fitnessLevel || null,
+      goal || null,
+      username,
+      password,
+  ];
 
-  const values = [name, age, gender, height, weight, fitnessLevel, goal, username, password];
-
+  // Query the database
   db.query(query, values, (err, result) => {
       if (err) {
-          console.error('Error inserting user into database:', err);
-          return res.status(500).send('Error creating user');
+          console.error("Error inserting user into database:", err);
+          return res.status(500).json({ error: "Error creating user" });
       }
 
-      // Respond with a success message or the new user ID if needed
-      res.status(201).send({ message: 'User created successfully', userId: result.insertId });
+      console.log("User created successfully, ID:", result.insertId);
+      res.status(201).json({ message: "User created successfully", userId: result.insertId });
   });
 });
+
 
 app.get('/api/exercises', (req, res) => {
     const muscleGroup = req.query.muscleGroup;
