@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import CreatePlanForm from './pages/CreatePlanForm';
 import LoginPage from './pages/LoginPage';
@@ -8,11 +8,16 @@ import ProtectedRoute from './components/ProtectedRoute';
 import styles from './App.module.css';
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(true); // For simplicity, assume user is authenticated
+    const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication starts as false
 
-    const handleLogin = () => setIsAuthenticated(true);
+    // Handles login and sets authentication to true
+    const handleLogin = () => {
+        setIsAuthenticated(true);
+    };
 
-    const handleRegister = () => alert('Account registered successfully!');
+    const handleRegister = () => {
+        alert('Account registered successfully!');
+    };
 
     const handleCreatePlan = (planDetails) => {
         console.log('Plan created:', planDetails);
@@ -23,9 +28,22 @@ function App() {
         <Router>
             <div className={styles.container}>
                 <Routes>
-                    {/* <Route path="/" element={<LoginPage onLogin={handleLogin} />} /> */}
-                    <Route path="/" element={<Dashboard/>} />
+                    {/* Login Page as the default route */}
+                    <Route
+                        path="/"
+                        element={
+                            isAuthenticated ? (
+                                <Navigate to="/dashboard" />
+                            ) : (
+                                <LoginPage onLogin={handleLogin} />
+                            )
+                        }
+                    />
+                    
+                    {/* Registration Page */}
                     <Route path="/register" element={<RegisterPage onRegister={handleRegister} />} />
+
+                    {/* Dashboard (Protected Route) */}
                     <Route
                         path="/dashboard"
                         element={
@@ -34,6 +52,8 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+
+                    {/* Create Plan Page (Protected Route) */}
                     <Route
                         path="/create-plan"
                         element={
@@ -42,6 +62,9 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+
+                    {/* Catch-all route to redirect unauthenticated users */}
+                    <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </div>
         </Router>
@@ -49,3 +72,4 @@ function App() {
 }
 
 export default App;
+
