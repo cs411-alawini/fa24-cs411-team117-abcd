@@ -15,7 +15,7 @@ const Dashboard = () => {
                 {/* User Info Section */}
                 <div className={styles.userInfo}>
                     <h2>Welcome USER</h2>
-                    <p>Your user ID is: {userId || 'N/A'}
+                    <p>Your user ID is: {userId || 'N/A'} </p>
                     <p>Age: 25</p>
                     <p>Height: 6'0"</p>
                     <p>Width: 180 lbs</p>
