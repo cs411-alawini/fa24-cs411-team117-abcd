@@ -8,9 +8,32 @@ function LoginPage({ onLogin }) {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = () => {
-        onLogin(username, password);
-        navigate('/dashboard');
+    const handleLogin = async () => {
+        if (!username || !password) {
+            alert('Please enter both username and password');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:5005/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Save the user ID and mark the user as authenticated
+                onLogin(data.userId);
+                navigate('/dashboard');
+            } else {
+                alert(data.message || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            alert('Failed to login. Please try again later.');
+        }
     };
     
     return (
