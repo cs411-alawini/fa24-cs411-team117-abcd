@@ -43,7 +43,7 @@ Dataset containing the amount of calories burned during several activities."
 
 
 #### Workflow:
-We will all work on the UI/UX for the first 3 weeks
+We will all work on the UI/UX for the first 3 week
 	Muscle Visualization component: Sana, Kaz
 User Quiz component: Sona, Nathan
 For the middle part of the semester:
