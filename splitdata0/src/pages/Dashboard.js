@@ -32,6 +32,16 @@ const Dashboard = () => {
                         Create Plan
                     </button>
                 </div>
+
+                <div className={styles.createPlan}>
+                    <h2>Find Existing Plan</h2>
+                    <button
+                        onClick={() => navigate('/find-plan')}
+                        className={styles.createButton}
+                    >
+                        Find a Plan
+                    </button>
+                </div>
             </div>
 
             {/* Bottom Section */}

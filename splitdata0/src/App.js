@@ -82,7 +82,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import styles from './App.module.css';
-
+import FindPlanPage from './pages/FindPlanPage.js';
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication starts as false
 
@@ -139,6 +139,13 @@ function App() {
                                     <CreatePlanForm onCreate={handleCreatePlan} />
                                 </ProtectedRoute>
                             }
+                        />
+
+                        <Route 
+                          path = "/find-plan"
+                          element = {
+                            <FindPlanPage/>
+                          }
                         />
 
                         {/* Catch-all route to redirect unauthenticated users */}

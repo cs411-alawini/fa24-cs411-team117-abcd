@@ -209,6 +209,43 @@ app.post('/api/save-plan', (req, res) => {
   res.status(201).json({ message: 'Plan saved successfully', data: { userId, planName, sessions } });
 });
 
+app.get('/api/plans', (req, res) => {
+  const query = `
+    SELECT Plan.Plan_ID, Plan.Plan_Name, Plan.User_ID, Plan_Contains.Day_of_Week, Session.Session_Name
+    FROM Plan
+    LEFT JOIN Plan_Contains ON Plan.Plan_ID = Plan_Contains.Plan_ID
+    LEFT JOIN Session ON Plan_Contains.Session_ID = Session.Session_ID
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching plans:', err);
+      return res.status(500).json({ error: 'Error fetching plans' });
+    }
+
+    // Group data by Plan_ID
+    const groupedPlans = results.reduce((acc, row) => {
+      if (!acc[row.Plan_ID]) {
+        acc[row.Plan_ID] = {
+          planName: row.Plan_Name,
+          userId: row.User_ID,
+          days: {},
+        };
+      }
+
+      if (row.Day_of_Week) {
+        acc[row.Plan_ID].days[row.Day_of_Week] = acc[row.Plan_ID].days[row.Day_of_Week] || [];
+        acc[row.Plan_ID].days[row.Day_of_Week].push(row.Session_Name);
+      }
+
+      return acc;
+    }, {});
+
+    res.json(Object.values(groupedPlans));
+  });
+});
+
+
 
   
   
