@@ -132,6 +132,85 @@ app.get('/api/exercises', (req, res) => {
       }
     });
   });
+
+ app.post('/api/save-plan', (req, res) => {
+  const { userId, planName, sessions } = req.body;
+
+  console.log('Received plan data:', { userId, planName, sessions });
+
+  if (!userId || !planName || !sessions || !sessions.length) {
+    return res.status(400).json({ error: 'Incomplete data to save plan' });
+  }
+
+  // Start transaction
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error('Transaction error:', err);
+      return res.status(500).json({ error: 'Failed to start transaction' });
+    }
+
+    // Insert into Plan table
+    const insertPlanQuery = 'INSERT INTO Plan (Plan_Name, User_ID) VALUES (?, ?)';
+    db.query(insertPlanQuery, [planName, userId], (err, planResult) => {
+      if (err) {
+        console.error('Error inserting plan:', err);
+        db.rollback(() => res.status(500).json({ error: 'Error saving plan' }));
+        return;
+      }
+
+      const planId = planResult.insertId;
+      console.log(`Plan inserted with ID: ${planId}`);
+
+      // Proceed to insert sessions and other related data
+      const insertSessionQuery = 'INSERT INTO Session (Session_Name, User_ID) VALUES (?, ?)';
+      const sessionPromises = sessions.map((session) => {
+        return new Promise((resolve, reject) => {
+          db.query(insertSessionQuery, [session.name, userId], (err, sessionResult) => {
+            if (err) return reject(err);
+            const sessionId = sessionResult.insertId;
+            console.log(`Session inserted with ID: ${sessionId} for Plan ID: ${planId}`);
+
+            // Insert related data (Plan_Contains, Sets, Exercises, etc.)
+            resolve();
+          });
+        });
+      });
+
+      Promise.all(sessionPromises)
+        .then(() => {
+          db.commit((err) => {
+            if (err) {
+              db.rollback(() => res.status(500).json({ error: 'Error committing transaction' }));
+              return;
+            }
+            console.log('Plan and related data saved successfully');
+            res.status(201).json({ message: 'Plan saved successfully', planId });
+          });
+        })
+        .catch((err) => {
+          console.error('Error saving plan sessions:', err);
+          db.rollback(() => res.status(500).json({ error: 'Error saving plan sessions' }));
+        });
+    });
+  });
+});
+
+app.post('/api/save-plan', (req, res) => {
+  const { userId, planName, sessions } = req.body;
+
+  console.log('Received data:', { userId, planName, sessions });
+
+  // Placeholder logic to verify API call
+  if (!userId || !planName || !sessions) {
+    return res.status(400).json({ error: 'Incomplete data' });
+  }
+
+  // Respond with success for testing
+  res.status(201).json({ message: 'Plan saved successfully', data: { userId, planName, sessions } });
+});
+
+
+  
   
   
 
