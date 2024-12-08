@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';  // (changed this) Import useUser from Context
 import './LoginPage.css'; // Using a regular CSS file
 
 function LoginPage({ onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const { login } = useUser();  // (changed this) Access the login function from context
 
     const handleLogin = async () => {
         if (!username || !password) {
@@ -26,6 +28,7 @@ function LoginPage({ onLogin }) {
             if (response.ok) {
                 // Save the user ID and mark the user as authenticated
                 onLogin(data.userId);
+                login(data.userId); // (changed this)This will store the user_id in the context
                 navigate('/dashboard');
             } else {
                 alert(data.message || 'Login failed');
