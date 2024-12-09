@@ -110,7 +110,56 @@ app.post("/api/register", (req, res) => {
       res.status(201).json({ message: "User created successfully", userId: result.insertId });
   });
 });
+// added this for editing
+app.put('/api/user/:userId', (req, res) => {
+  console.log(`Received PUT request for userId: ${req.params.userId}`);
+  console.log('Request body:', req.body);
+  const userId = req.params.userId;
+  const { name, age, height, weight } = req.body;
 
+  console.log('PUT request for userId:', userId, 'with body:', req.body);
+
+  const query = `
+      UPDATE Users 
+      SET Name = ?, Age = ?, Height = ?, Weight = ?
+      WHERE User_ID = ?
+  `;
+
+  const values = [name, age, height, weight, userId];
+
+  db.query(query, values, (err, result) => {
+      if (err) {
+          console.error('Error updating user data:', err);
+          return res.status(500).json({ message: 'Error updating user data' });
+      }
+      console.log('Update query result:', result);
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'User not found' });
+      } 
+
+
+      res.json({ message: 'User data updated successfully' });
+  });
+});
+
+// added this for rendering stats
+app.get('/api/user/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  const query = 'SELECT Name, Age, Height, Weight FROM Users WHERE User_ID = ?';
+  db.query(query, [userId], (err, results) => {
+      if (err) {
+          console.error('Error fetching user data:', err);
+          return res.status(500).json({ message: 'Error fetching user data' });
+      }
+      console.log('Fetched user data:', results);
+      if (results.length === 0) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.json(results[0]); // Send the user's data as JSON
+  });
+});
 
 app.get('/api/exercises', (req, res) => {
     const muscleGroup = req.query.muscleGroup;
