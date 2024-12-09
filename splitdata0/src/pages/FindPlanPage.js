@@ -27,7 +27,7 @@ const FindPlanPage = () => {
   useEffect(() => {
     setFilteredPlans(
       plans.filter((plan) =>
-        plan.planName.toLowerCase().includes(searchTerm.toLowerCase())
+        plan.planName?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
   }, [searchTerm, plans]);
@@ -46,25 +46,30 @@ const FindPlanPage = () => {
       <div className={styles.planList}>
         {filteredPlans.map((plan) => (
           <div
-            key={plan.planName}
+            key={plan.planId}
             className={styles.planItem}
             onClick={() => setSelectedPlan(plan)}
           >
-            {plan.planName}
+            {plan.planName || 'Unnamed Plan'}
           </div>
         ))}
       </div>
 
       {selectedPlan && (
         <div className={styles.planDetails}>
-          <h3>Plan: {selectedPlan.planName}</h3>
-          <h4>Day-by-Day Summary:</h4>
+          <h3>Plan: {selectedPlan.planName || 'Unnamed Plan'}</h3>
+          <h4>Day-by-Day Sessions:</h4>
           <ul>
-            {Object.keys(selectedPlan.days).map((day) => (
-              <li key={day}>
-                <strong>{day}:</strong> {selectedPlan.days[day].join(', ')}
-              </li>
-            ))}
+            {selectedPlan.sessions && selectedPlan.sessions.length > 0 ? (
+              selectedPlan.sessions.map((session, index) => (
+                <li key={index}>
+                  <strong>{session.day || 'No Day Assigned'}:</strong>{' '}
+                  {session.name || 'No Name'}
+                </li>
+              ))
+            ) : (
+              <li>No sessions available for this plan.</li>
+            )}
           </ul>
         </div>
       )}

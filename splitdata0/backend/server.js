@@ -214,16 +214,26 @@ app.get('/api/exercises', (req, res) => {
       const insertSessionQuery = 'INSERT INTO Session (Session_Name, User_ID) VALUES (?, ?)';
       const sessionPromises = sessions.map((session) => {
         return new Promise((resolve, reject) => {
+          // Insert into Session table
+          const insertSessionQuery = 'INSERT INTO Session (Session_Name, User_ID) VALUES (?, ?)';
           db.query(insertSessionQuery, [session.name, userId], (err, sessionResult) => {
             if (err) return reject(err);
+      
             const sessionId = sessionResult.insertId;
-            console.log(`Session inserted with ID: ${sessionId} for Plan ID: ${planId}`);
-
-            // Insert related data (Plan_Contains, Sets, Exercises, etc.)
-            resolve();
+      
+            // Link Plan and Session in Plan_Contains
+            const linkPlanSessionQuery = `
+              INSERT INTO Plan_Contains (Plan_ID, Session_ID, Day_of_Week)
+              VALUES (?, ?, ?)
+            `;
+            db.query(linkPlanSessionQuery, [planId, sessionId, session.day], (err) => {
+              if (err) return reject(err);
+              resolve();
+            });
           });
         });
       });
+      
 
       Promise.all(sessionPromises)
         .then(() => {
