@@ -83,6 +83,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import styles from './App.module.css';
 import FindPlanPage from './pages/FindPlanPage.js';
+import FindPlanPage2 from './pages/FindPlanPage2.js';
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication starts as false
 

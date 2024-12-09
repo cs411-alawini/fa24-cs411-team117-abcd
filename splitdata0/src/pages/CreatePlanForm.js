@@ -5,7 +5,7 @@ import WeeklySummary from '../components/WeeklySummary';
 import styles from './CreatePlanForm.module.css';
 
 const CreatePlanForm = () => {
-    const [planName, setPlanName] = useState(''); // Track the plan name
+    const [planName, setPlanName] = useState('');
     const [workoutsByDay, setWorkoutsByDay] = useState({
         Monday: [],
         Tuesday: [],
@@ -16,33 +16,37 @@ const CreatePlanForm = () => {
         Sunday: [],
     });
 
-    // Handle adding workouts
     const handleAddWorkout = (day, workout) => {
+        // Ensure that workout includes { exerciseId, name, reps }
+        // The DaySelector or the source adding workouts should provide these.
         setWorkoutsByDay((prev) => ({
             ...prev,
-            [day]: [...(prev[day] || []), workout], // Ensure prev[day] is an array
+            [day]: [...(prev[day] || []), workout],
         }));
     };
 
-    // Handle submitting the plan
     const handleSubmitPlan = async () => {
         if (!planName) {
             alert('Please enter a plan name.');
             return;
         }
 
+        // Construct the sessions data
         const sessions = Object.keys(workoutsByDay).map((day) => ({
             day,
             name: `${day} Session`,
             sets: workoutsByDay[day].map((workout) => ({
                 name: `${workout.name} Set`,
                 reps: workout.reps,
-                exercises: [{ exerciseId: workout.exerciseId, reps: workout.reps }],
+                // Include the exerciseId from the workout
+                exercises: [
+                    { exerciseId: workout.exerciseId, reps: workout.reps },
+                ],
             })),
         }));
 
         const planData = {
-            userId: 1, // Replace with the actual user ID
+            userId: 1, // Replace with the actual user ID of the logged-in user
             planName,
             sessions,
         };

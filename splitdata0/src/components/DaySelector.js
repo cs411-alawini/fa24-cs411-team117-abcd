@@ -8,6 +8,9 @@ function DaySelector({ onAddWorkout }) {
   const [selectedDay, setSelectedDay] = useState(null);
 
   const handleAddWorkout = (workout) => {
+    // `workout` should be an object like:
+    // { exerciseId: 123, name: 'Bench Press', reps: 10 }
+    // Assuming FilteredWorkoutList passes this structure:
     onAddWorkout(selectedDay, workout);
   };
 
