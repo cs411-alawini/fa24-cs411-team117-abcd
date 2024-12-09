@@ -1,25 +1,41 @@
-// import React from 'react';
-import React, { useState, useEffect } from 'react'; // changed this
+import React, { useState, useEffect } from 'react';  // changed this
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';  // (changed this) Use the context to get the user_id
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
-    const { userId } = useUser();  // (changed this) Get user_id from context
-    
-    const [userInfo, setUserInfo] = useState(null);  // (changed this) State to hold the user's detailed info
+    const { userId } = useUser(); // (changed this) Get user_id from context
+    const [userInfo, setUserInfo] = useState(null); // State to hold the user's detailed info
     const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
     const [editedInfo, setEditedInfo] = useState({});
 
-
     console.log('Dashboard: userId from context:', userId);
-    //added these functions
+
+    // user details from the server
+    const fetchUserData = (userId) => {
+        fetch(`http://localhost:5005/api/user/${userId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('User data fetched:', data);
+                setUserInfo({
+                    name: data.Name || 'N/A',
+                    age: data.Age || 'N/A',
+                    height: parseFloat(data.Height) || 'N/A',
+                    weight: parseFloat(data.Weight) || 'N/A', 
+                    bmi: parseFloat(data.BMI) || 'N/A',
+                });
+            })
+            .catch((error) => {
+                console.error('Error fetching user data:', error);
+            });
+    };
+
     const handleEditClick = () => {
         setIsEditing(true);
-        setEditedInfo({ ...userInfo }); // Copy current user data for editing
+        setEditedInfo({ ...userInfo });
     };
-    
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEditedInfo((prev) => ({
@@ -27,18 +43,17 @@ const Dashboard = () => {
             [name]: value,
         }));
     };
-    
+
     const handleSaveClick = () => {
-        // Ensure weight and height are valid decimals (floats) and age is an integer
         const updatedInfo = {
             ...editedInfo,
             weight: isNaN(parseFloat(editedInfo.weight)) || parseFloat(editedInfo.weight) <= 0 ? null : parseFloat(editedInfo.weight),
             height: isNaN(parseFloat(editedInfo.height)) || parseFloat(editedInfo.height) <= 0 ? null : parseFloat(editedInfo.height),
             age: isNaN(parseInt(editedInfo.age)) || parseInt(editedInfo.age) <= 0 ? null : parseInt(editedInfo.age),
         };
-    
+
         console.log(`Saving edited info for userId: ${userId}`, updatedInfo);
-    
+
         fetch(`http://localhost:5005/api/user/${userId}`, {
             method: 'PUT',
             headers: {
@@ -46,45 +61,41 @@ const Dashboard = () => {
             },
             body: JSON.stringify(updatedInfo),
         })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then((data) => {
-            console.log('Update response:', data);
-            // setUserInfo(updatedInfo);  // Update the state with the new data
-            setIsEditing(false);  // Exit editing mode
-            
-            fetchUserData(userId, setUserInfo);  // update state with new data -- new way
-        })
-        .catch((error) => {
-            console.error('Error updating user data:', error);
-        });
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(() => {
+                setIsEditing(false); // Exit editing mode
+                fetchUserData(userId); // Refresh the data after updating
+            })
+            .catch((error) => {
+                console.error('Error updating user data:', error);
+            });
     };
-    
-    
 
-    // changed this
     useEffect(() => {
-        console.log('Dashboard: userId from context:', userId);
         if (userId) {
-            // Fetch user details from the server
-            fetchUserData(userId, setUserInfo);
+            fetchUserData(userId);
         }
     }, [userId]);
-    //changed this
+
     if (!userInfo) {
-        return <p>Loading user data...</p>; // Show a loading message while fetching data
+        return <p>Loading user data...</p>;
     }
 
     return (
         <div className={styles.dashboardContainer}>
-            {/* Top Section */}
-            <div className={styles.topSection}>
-                {/* User Info Section, updated this*/}
-                <div className={styles.userInfo}>
+            <div className={styles.header}>
+                <h1>Welcome to Your Dashboard</h1>
+                <p>Manage your profile and fitness plans here.</p>
+            </div>
+
+            <div className={styles.cardRow}>
+                {/* User Info Card */}
+                <div className={`${styles.card} ${styles.infoCard}`}>
                     {isEditing ? (
                         <>
                             <input
@@ -92,12 +103,14 @@ const Dashboard = () => {
                                 name="name"
                                 value={editedInfo.name || ''}
                                 onChange={handleInputChange}
+                                placeholder="Name"
                             />
                             <input
                                 type="number"
                                 name="age"
                                 value={editedInfo.age || ''}
                                 onChange={handleInputChange}
+                                placeholder="Age"
                             />
                             <input
                                 type="number"
@@ -105,6 +118,7 @@ const Dashboard = () => {
                                 name="height"
                                 value={editedInfo.height || ''}
                                 onChange={handleInputChange}
+                                placeholder="Height (m)"
                             />
                             <input
                                 type="number"
@@ -112,6 +126,7 @@ const Dashboard = () => {
                                 name="weight"
                                 value={editedInfo.weight || ''}
                                 onChange={handleInputChange}
+                                placeholder="Weight (kg)"
                             />
                             <button onClick={handleSaveClick}>Save</button>
                             <button onClick={() => setIsEditing(false)}>Cancel</button>
@@ -119,38 +134,27 @@ const Dashboard = () => {
                     ) : (
                         <>
                             <h2>Welcome, {userInfo.name || 'User'}!</h2>
-                            <p>Your user ID is: {userId}</p>
-                            <p onClick={handleEditClick}>Age: {userInfo.age || 'N/A'}</p>
-                            <p onClick={handleEditClick}>Height: {userInfo.height || 'N/A'} m</p>
-                            <p onClick={handleEditClick}>Weight: {userInfo.weight || 'N/A'} kg</p>
-                            <p onClick={handleEditClick}>BMI: {userInfo.bmi}</p>
+                            <p>Age: {userInfo.age || 'N/A'}</p>
+                            <p>Height: {userInfo.height || 'N/A'} m</p>
+                            <p>Weight: {userInfo.weight || 'N/A'} kg</p>
+                            <p>BMI: {userInfo.bmi || 'N/A'}</p>
                             <button onClick={handleEditClick}>Edit Info</button>
                         </>
                     )}
                 </div>
 
-                {/* Create Plan Button */}
-                <div className={styles.createPlan}>
+                {/* Create Plan Card */}
+                <div className={`${styles.card} ${styles.planCard}`}>
                     <h2>Create a Plan</h2>
-                    <button
-                        onClick={() => navigate('/create-plan')}
-                        className={styles.createButton}
-                    >
-                        Create Plan
-                    </button>
+                    <button onClick={() => navigate('/create-plan')}>Create Plan</button>
                 </div>
 
-                <div className={styles.createPlan}>
+                {/* Find Plan Card */}
+                <div className={`${styles.card} ${styles.planCard}`}>
                     <h2>Find Existing Plan</h2>
-                    <button
-                        onClick={() => navigate('/find-plan')}
-                        className={styles.createButton}
-                    >
-                        Find a Plan
-                    </button>
+                    <button onClick={() => navigate('/find-plan')}>Find Plan</button>
                 </div>
             </div>
-
             {/* Bottom Section */}
             {/* <div className={styles.bottomSection}> */}
                 {/* <h3>Your subscribed Plans:</h3> */}
@@ -161,22 +165,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-function fetchUserData(userId, setUserInfo) {
-    fetch(`http://localhost:5005/api/user/${userId}`)
-        .then((response) => response.json())
-        .then((data) => {
-            console.log('User data fetched:', data);
-            // Ensure correct data mapping
-            setUserInfo({
-                name: data.Name || 'N/A',
-                age: data.Age || 'N/A',
-                height: parseFloat(data.Height) || 'N/A', // Parse height as a number
-                weight: parseFloat(data.Weight) || 'N/A', // Parse weight as a number
-                bmi: parseFloat(data.BMI) || 'N/A', // also parse bmi as a number
-            });
-        })
-        .catch((error) => {
-            console.error('Error fetching user data:', error);
-        });
-}
-
