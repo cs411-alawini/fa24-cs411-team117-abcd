@@ -182,183 +182,106 @@ app.get('/api/exercises', (req, res) => {
     });
   });
 
- app.post('/api/save-plan', (req, res) => {
-  const { userId, planName, sessions } = req.body;
-
-  console.log('Received plan data:', { userId, planName, sessions });
-
-  if (!userId || !planName || !sessions || !sessions.length) {
-    return res.status(400).json({ error: 'Incomplete data to save plan' });
-  }
-
-  // Start transaction
-  db.beginTransaction((err) => {
-    if (err) {
-      console.error('Transaction error:', err);
-      return res.status(500).json({ error: 'Failed to start transaction' });
+  app.post('/api/save-plan', (req, res) => {
+    const { userId, planName, sessions } = req.body;
+  
+    console.log('Received plan data:', { userId, planName, sessions });
+  
+    if (!userId || !planName || !sessions || !sessions.length) {
+      return res.status(400).json({ error: 'Incomplete data to save plan' });
     }
-
-    // Insert into Plan table
-    const insertPlanQuery = 'INSERT INTO Plan (Plan_Name, User_ID) VALUES (?, ?)';
-    db.query(insertPlanQuery, [planName, userId], (err, planResult) => {
+  
+    // Start transaction
+    db.beginTransaction((err) => {
       if (err) {
-        console.error('Error inserting plan:', err);
-        db.rollback(() => res.status(500).json({ error: 'Error saving plan' }));
-        return;
+        console.error('Transaction error:', err);
+        return res.status(500).json({ error: 'Failed to start transaction' });
       }
-
-      const planId = planResult.insertId;
-      console.log(`Plan inserted with ID: ${planId}`);
-
-      // Proceed to insert sessions and other related data
-      const insertSessionQuery = 'INSERT INTO Session (Session_Name, User_ID) VALUES (?, ?)';
-      const sessionPromises = sessions.map((session) => {
-        return new Promise((resolve, reject) => {
-          // Insert into Session table
-          const insertSessionQuery = 'INSERT INTO Session (Session_Name, User_ID) VALUES (?, ?)';
-          db.query(insertSessionQuery, [session.name, userId], (err, sessionResult) => {
-            if (err) return reject(err);
-      
-            const sessionId = sessionResult.insertId;
-      
-            // Link Plan and Session in Plan_Contains
-            const linkPlanSessionQuery = `
-              INSERT INTO Plan_Contains (Plan_ID, Session_ID, Day_of_Week)
-              VALUES (?, ?, ?)
-            `;
-            db.query(linkPlanSessionQuery, [planId, sessionId, session.day], (err) => {
+  
+      // Insert into Plan table
+      const insertPlanQuery = 'INSERT INTO Plan (Plan_Name, User_ID) VALUES (?, ?)';
+      db.query(insertPlanQuery, [planName, userId], (err, planResult) => {
+        if (err) {
+          console.error('Error inserting plan:', err);
+          db.rollback(() => res.status(500).json({ error: 'Error saving plan' }));
+          return;
+        }
+  
+        const planId = planResult.insertId;
+        console.log(`Plan inserted with ID: ${planId}`);
+  
+        // Proceed to insert sessions and other related data
+        const insertSessionQuery = 'INSERT INTO Session (Session_Name, User_ID) VALUES (?, ?)';
+        const sessionPromises = sessions.map((session) => {
+          return new Promise((resolve, reject) => {
+            db.query(insertSessionQuery, [session.name, userId], (err, sessionResult) => {
               if (err) return reject(err);
+              const sessionId = sessionResult.insertId;
+              console.log(`Session inserted with ID: ${sessionId} for Plan ID: ${planId}`);
+  
+              // Insert related data (Plan_Contains, Sets, Exercises, etc.)
               resolve();
             });
           });
         });
-      });
-      
-
-      Promise.all(sessionPromises)
-        .then(() => {
-          db.commit((err) => {
-            if (err) {
-              db.rollback(() => res.status(500).json({ error: 'Error committing transaction' }));
-              return;
-            }
-            console.log('Plan and related data saved successfully');
-            res.status(201).json({ message: 'Plan saved successfully', planId });
-          });
-        })
-        .catch((err) => {
-          console.error('Error saving plan sessions:', err);
-          db.rollback(() => res.status(500).json({ error: 'Error saving plan sessions' }));
-        });
-    });
-  });
-});
-
-app.post('/api/save-plan', (req, res) => {
-  const { userId, planName, sessions } = req.body;
-
-  if (!userId || !planName || !sessions || !sessions.length) {
-    return res.status(400).json({ error: 'Incomplete data to save plan' });
-  }
-
-  // Start a database transaction
-  db.beginTransaction((err) => {
-    if (err) {
-      console.error('Transaction error:', err);
-      return res.status(500).json({ error: 'Failed to start transaction' });
-    }
-
-    // Insert into Plan table
-    const insertPlanQuery = 'INSERT INTO Plan (Plan_Name, User_ID) VALUES (?, ?)';
-    db.query(insertPlanQuery, [planName, userId], (err, planResult) => {
-      if (err) {
-        console.error('Error inserting plan:', err);
-        db.rollback(() => res.status(500).json({ error: 'Error saving plan' }));
-        return;
-      }
-
-      const planId = planResult.insertId;
-
-      // Insert sessions and link to Plan_Contains
-      const sessionPromises = sessions.map((session) => {
-        return new Promise((resolve, reject) => {
-          // Insert into Session table
-          const insertSessionQuery = 'INSERT INTO Session (Session_Name, User_ID) VALUES (?, ?)';
-          db.query(insertSessionQuery, [session.name, userId], (err, sessionResult) => {
-            if (err) return reject(err);
-
-            const sessionId = sessionResult.insertId;
-
-            // Link Plan and Session in Plan_Contains
-            const linkPlanSessionQuery = `
-              INSERT INTO Plan_Contains (Plan_ID, Session_ID, Day_of_Week)
-              VALUES (?, ?, ?)
-            `;
-            db.query(linkPlanSessionQuery, [planId, sessionId, session.day], (err) => {
-              if (err) return reject(err);
-              resolve();
+  
+        Promise.all(sessionPromises)
+          .then(() => {
+            db.commit((err) => {
+              if (err) {
+                db.rollback(() => res.status(500).json({ error: 'Error committing transaction' }));
+                return;
+              }
+              console.log('Plan and related data saved successfully');
+              res.status(201).json({ message: 'Plan saved successfully', planId });
             });
+          })
+          .catch((err) => {
+            console.error('Error saving plan sessions:', err);
+            db.rollback(() => res.status(500).json({ error: 'Error saving plan sessions' }));
           });
-        });
       });
-
-      // Commit the transaction
-      Promise.all(sessionPromises)
-        .then(() => {
-          db.commit((err) => {
-            if (err) {
-              console.error('Error committing transaction:', err);
-              db.rollback(() => res.status(500).json({ error: 'Transaction failed' }));
-              return;
-            }
-            res.status(201).json({ message: 'Plan saved successfully', planId });
-          });
-        })
-        .catch((err) => {
-          console.error('Error saving sessions:', err);
-          db.rollback(() => res.status(500).json({ error: 'Error saving sessions' }));
-        });
     });
   });
-});
+  
 
-app.get('/api/plans', (req, res) => {
-  const query = `
-    SELECT Plan.Plan_ID, Plan.Plan_Name, Session.Session_Name, Plan_Contains.Day_of_Week
-    FROM Plan
-    LEFT JOIN Plan_Contains ON Plan.Plan_ID = Plan_Contains.Plan_ID
-    LEFT JOIN Session ON Plan_Contains.Session_ID = Session.Session_ID;
-  `;
-
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error('Error fetching plans:', err);
-      return res.status(500).json({ error: 'Error fetching plans' });
-    }
-
-    // Group data by Plan_ID
-    const groupedPlans = results.reduce((acc, row) => {
-      if (!acc[row.Plan_ID]) {
-        acc[row.Plan_ID] = {
-          planId: row.Plan_ID,
-          planName: row.Plan_Name,
-          sessions: [],
-        };
+  app.get('/api/plans', (req, res) => {
+    const query = `
+      SELECT Plan.Plan_ID, Plan.Plan_Name, Plan.User_ID, Plan_Contains.Day_of_Week, Session.Session_Name
+      FROM Plan
+      LEFT JOIN Plan_Contains ON Plan.Plan_ID = Plan_Contains.Plan_ID
+      LEFT JOIN Session ON Plan_Contains.Session_ID = Session.Session_ID
+    `;
+  
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error fetching plans:', err);
+        return res.status(500).json({ error: 'Error fetching plans' });
       }
-
-      if (row.Session_Name) {
-        acc[row.Plan_ID].sessions.push({
-          day: row.Day_of_Week,
-          name: row.Session_Name,
-        });
-      }
-
-      return acc;
-    }, {});
-
-    res.json(Object.values(groupedPlans));
+  
+      // Group data by Plan_ID
+      const groupedPlans = results.reduce((acc, row) => {
+        if (!acc[row.Plan_ID]) {
+          acc[row.Plan_ID] = {
+            planName: row.Plan_Name,
+            userId: row.User_ID,
+            days: {},
+          };
+        }
+  
+        if (row.Day_of_Week) {
+          acc[row.Plan_ID].days[row.Day_of_Week] = acc[row.Plan_ID].days[row.Day_of_Week] || [];
+          acc[row.Plan_ID].days[row.Day_of_Week].push(row.Session_Name);
+        }
+  
+        return acc;
+      }, {});
+  
+      res.json(Object.values(groupedPlans));
+    });
   });
-});
+  
+
 
 
 
