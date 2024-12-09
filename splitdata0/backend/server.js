@@ -146,7 +146,7 @@ app.put('/api/user/:userId', (req, res) => {
 app.get('/api/user/:userId', (req, res) => {
   const userId = req.params.userId;
 
-  const query = 'SELECT Name, Age, Height, Weight FROM Users WHERE User_ID = ?';
+  const query = 'SELECT Name, Age, Height, Weight, BMI FROM Users WHERE User_ID = ?';
   db.query(query, [userId], (err, results) => {
       if (err) {
           console.error('Error fetching user data:', err);

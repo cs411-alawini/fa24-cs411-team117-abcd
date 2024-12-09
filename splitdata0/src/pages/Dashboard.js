@@ -54,8 +54,10 @@ const Dashboard = () => {
         })
         .then((data) => {
             console.log('Update response:', data);
-            setUserInfo(updatedInfo);  // Update the state with the new data
+            // setUserInfo(updatedInfo);  // Update the state with the new data
             setIsEditing(false);  // Exit editing mode
+            
+            fetchUserData(userId, setUserInfo);  // update state with new data -- new way
         })
         .catch((error) => {
             console.error('Error updating user data:', error);
@@ -69,21 +71,7 @@ const Dashboard = () => {
         console.log('Dashboard: userId from context:', userId);
         if (userId) {
             // Fetch user details from the server
-            fetch(`http://localhost:5005/api/user/${userId}`)
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log('User data fetched:', data);
-                    // Ensure correct data mapping
-                    setUserInfo({
-                        name: data.Name || 'N/A',
-                        age: data.Age || 'N/A',
-                        height: parseFloat(data.Height) || 'N/A', // Parse height as a number
-                        weight: parseFloat(data.Weight) || 'N/A', // Parse weight as a number
-                    });
-                })
-                .catch((error) => {
-                    console.error('Error fetching user data:', error);
-                });
+            fetchUserData(userId, setUserInfo);
         }
     }, [userId]);
     //changed this
@@ -133,8 +121,9 @@ const Dashboard = () => {
                             <h2>Welcome, {userInfo.name || 'User'}!</h2>
                             <p>Your user ID is: {userId}</p>
                             <p onClick={handleEditClick}>Age: {userInfo.age || 'N/A'}</p>
-                            <p onClick={handleEditClick}>Height: {userInfo.height || 'N/A'} cm</p>
+                            <p onClick={handleEditClick}>Height: {userInfo.height || 'N/A'} m</p>
                             <p onClick={handleEditClick}>Weight: {userInfo.weight || 'N/A'} kg</p>
+                            <p onClick={handleEditClick}>BMI: {userInfo.bmi}</p>
                             <button onClick={handleEditClick}>Edit Info</button>
                         </>
                     )}
@@ -172,3 +161,22 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+function fetchUserData(userId, setUserInfo) {
+    fetch(`http://localhost:5005/api/user/${userId}`)
+        .then((response) => response.json())
+        .then((data) => {
+            console.log('User data fetched:', data);
+            // Ensure correct data mapping
+            setUserInfo({
+                name: data.Name || 'N/A',
+                age: data.Age || 'N/A',
+                height: parseFloat(data.Height) || 'N/A', // Parse height as a number
+                weight: parseFloat(data.Weight) || 'N/A', // Parse weight as a number
+                bmi: parseFloat(data.BMI) || 'N/A', // also parse bmi as a number
+            });
+        })
+        .catch((error) => {
+            console.error('Error fetching user data:', error);
+        });
+}
+
